@@ -1,4 +1,8 @@
 {
     "python.linting.pylintEnabled": true,
-    "python.linting.enabled": true
+    "python.linting.enabled": true,
+    "autoDocstring.startOnNewLine": true,
+    "autoDocstring.includeName": true,
+    "autoDocstring.customTemplatePath": "Google_Template.mustache",
+    "autoDocstring.docstringFormat": "sphinx"
 }

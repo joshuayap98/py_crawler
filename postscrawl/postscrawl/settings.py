@@ -11,8 +11,8 @@
 
 BOT_NAME = 'postscrawl'
 
-SPIDER_MODULES = ['postscrawl.spiders']
-NEWSPIDER_MODULE = 'postscrawl.spiders'
+SPIDER_MODULES = ['postscrawl.postscrawl.spiders']
+NEWSPIDER_MODULE = 'postscrawl.postscrawl.spiders'
 
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
@@ -64,9 +64,9 @@ ROBOTSTXT_OBEY = False
 
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
-#ITEM_PIPELINES = {
-#    'postscrawl.pipelines.PostscrawlPipeline': 300,
-#}
+ITEM_PIPELINES = {
+   'postscrawl.postscrawl.pipelines.PostscrawlPipeline': 300,
+}
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://docs.scrapy.org/en/latest/topics/autothrottle.html

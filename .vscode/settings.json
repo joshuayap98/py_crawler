@@ -1,8 +1,11 @@
 {
     "python.linting.pylintEnabled": true,
     "python.linting.enabled": true,
-    "autoDocstring.startOnNewLine": true,
-    "autoDocstring.includeName": true,
-    "autoDocstring.customTemplatePath": "Google_Template.mustache",
-    "autoDocstring.docstringFormat": "sphinx"
+    "python.pythonPath": "${workspaceFolder}/bin/python",
+    "extensions.confirmedUriHandlerExtensionIds": [
+    
+    ],
+    "files.associations": {
+    
+    }
 }

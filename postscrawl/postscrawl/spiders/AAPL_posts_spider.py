@@ -1,5 +1,4 @@
 import scrapy
-import requests
 from .exceptions import Exceptions
 class StaticVariable:
 
@@ -7,26 +6,18 @@ class StaticVariable:
 
 class AAPLPostSpider(scrapy.Spider):
     name = "AAPL_posts"
-    allowed_domains = ['finance.yahoo.com']
-    start_urls = [
-        'https://finance.yahoo.com/quote/AAPL/news'
-    ]
-    posts_array = []
+    allowed_domains = ['finance.yahoo.com', 'thestreet.com', 'marketwatch.com', 'investopedia.com']
+    start_urls = ['https://finance.yahoo.com/quote/AAPL/news']
 
     def parse(self, response):
-        print('---[START] Crawl process has started on %s---' % self.start_urls[0])
+        print('%s[START]%s' % ('-'*50, '-'*50))
         for post in response.css('li.js-stream-content'):
             next_url = self.url_check(post.css('h3 a').attrib['href'])
-            if next_url is not None:
-                try:
-                    print('[LOG] Attempt next_url: %s' % next_url)
-                    post = scrapy.Request(next_url, self.parse_detail)
-                    self.posts_array.append(post)
-                    print('[LOG] Attempted next_url, added: \n%s.\nposts_array length: %d' 
-                    % ( next_url, len(self.posts_array)))
-                except:
-                    print('[EXCEPTION] %s' % Exceptions.INVALID)
-        print('---[END] Crawl process has ended on %s---' % self.start_urls[0])
+            if next_url:
+                # Create temp item dictionary for callback function to populate
+                item = {}
+                yield scrapy.Request(next_url, callback=self.parse_detail, meta={'item': item})
+        
 
                 
     def url_check(self, url):
@@ -34,7 +25,6 @@ class AAPLPostSpider(scrapy.Spider):
             print(Exceptions.BLACKLISTED + ': ' + url)
             return None
         try:
-            print('[LOG] GET Request to url: %s' % url)
             requests.get(url)
             return url
         except:
@@ -43,11 +33,12 @@ class AAPLPostSpider(scrapy.Spider):
 
     """
     [summary]
-    return a post object.
+    Yield item object to PostscrawlPipeline for data collection and storage
     """
     def parse_detail(self, response):
-        return {
-            'title': response.css('title::text').get(),
-            'time': response.css('time::text')[0].get() if not None else 'Date unspecified',
-            'source': response.request.url
-        }
+        item = response.meta['item']
+        item['source'] = response.request.url
+        item['title'] = response.css('title::text').get()
+        item['date'] = response.css('time::text')[0].get() if not None else 'Date unspecified'
+        item['body'] = response.css('p::text').getall()
+        yield item

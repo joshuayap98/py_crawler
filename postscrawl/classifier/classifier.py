@@ -8,10 +8,6 @@ import pandas as pd
 
 class Classifier(object):
     def __init__(self):
-        try:
-            nltk.data.find('tokenizers/punkt')
-        except LookupError:
-            nltk.download('punkt')
         self.lem = WordNetLemmatizer()
 
     def sent_tokenisation(self, sent):

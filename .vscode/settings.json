@@ -1,11 +1,5 @@
 {
     "python.linting.pylintEnabled": true,
     "python.linting.enabled": true,
-    "python.pythonPath": "${workspaceFolder}/bin/python",
-    "extensions.confirmedUriHandlerExtensionIds": [
-    
-    ],
-    "files.associations": {
-    
-    }
+    "python.pythonPath": "/Users/joshuayap/Desktop/py_crawler/bin/python"
 }

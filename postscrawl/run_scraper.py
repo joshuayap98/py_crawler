@@ -11,6 +11,7 @@ class Scraper(object):
         self.process = CrawlerProcess(get_project_settings())
         self.spider = AAPLPostSpider
 
+
     def start_AAPL_posts_crawl(self):
         self.process.crawl(self.spider)
         self.process.start()

@@ -43,6 +43,3 @@ class AAPLPostSpider(scrapy.Spider):
         item['date'] = response.css('time::text')[0].get() if not None else 'Date unspecified'
         item['body'] = response.css('p::text').getall()
         yield item
-
-        # group bot -> no reply (keep spamming major ones [updates])
-        # chat bot -> 1/1, choose which stock to register to/ also display top requests

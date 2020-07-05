@@ -4,8 +4,11 @@ from nltk.probability import FreqDist
 from nltk.corpus import stopwords
 from nltk.stem.wordnet import WordNetLemmatizer
 
-from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
+from sklearn.naive_bayes import MultinomialNB
+from sklearn import metrics
 
 import pandas as pd
 
@@ -13,11 +16,19 @@ import pandas as pd
 class Classifier(object):
     def __init__(self):
         self.lem = WordNetLemmatizer()
+        # Implementation 2.0
+        self.X_train = None
+        self.X_test = None
+        self.y_train = None
+        self.y_test = None
+        
+        # Implementation 1.0
+
         # ngram_range=(1,1) Bag of words (default) 
         # ngram_range=(2,2) Bigrams only 
         # ngram_range=(1,2) Both!
-        self.basicvectorizer = CountVectorizer(ngram_range=(1,2))
-        self.basicmodel = LogisticRegression(max_iter=1000)
+        # self.basicvectorizer = CountVectorizer(ngram_range=(1,2))
+        # self.basicmodel = LogisticRegression(max_iter=1000)
 
     def sent_tokenisation(self, sent):
         return sent_tokenize(sent)
@@ -49,15 +60,41 @@ class Classifier(object):
     def visualise_csv_data(self, tokenized_word_array):
         print(pd.DataFrame([[x,tokenized_word_array.count(x)] for x in set(tokenized_word_array)], 
                 columns = ['Word', 'Count']))
+
+    """
+    [summary] Implementation 2.0
+    """
+    def concat_dataset(self, dataset):
+        trainheadlines = []
+        # dataset.iloc[...] does not include headers
+        for row in range(0,len(dataset.index)):
+            trainheadlines.append(' '.join(str(x) for x in dataset.iloc[row,2:27]))
+        return trainheadlines
+        
     """
     [summary] generates a document term matrix to count the number of occurance of a single word
     """
-    def generate_term_matrix(self, data):
+    def generate_term_matrix(self, dataset, concat_dataset):
         token = RegexpTokenizer(r'[a-zA-Z0-9]+')
-        cv = CountVectorizer(lowercase=True,stop_words='english',ngram_range = (1,1),tokenizer = token.tokenize)
-        text_count = cv.fit_transform(data)
-        return text_count
+        # cv = CountVectorizer(lowercase=True,stop_words='english',ngram_range = (1,1),tokenizer = token.tokenize)
+        # text_count = cv.fit_transform(concat_dataset)
+        tf=TfidfVectorizer()
+        text_tf= tf.fit_transform(concat_dataset)
+        self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(
+        text_tf, dataset['Label'], test_size=0.3, random_state=123)
+        clf = MultinomialNB().fit(self.X_train, self.y_train)
+        predicted= clf.predict(self.X_test)
+        print("MultinomialNB Accuracy:",metrics.accuracy_score(self.y_test, predicted))
 
+
+
+
+
+
+    """
+    [summary] Implementation 1.0
+    """
+"""
     def get_train_headlines(self, train_dataset):
         trainheadlines = []
         # dataset.iloc[...] does not include headers
@@ -85,3 +122,4 @@ class Classifier(object):
                                 'Coefficient' : basiccoeffs})
         coeffdf = coeffdf.sort_values(['Coefficient', 'Word'], ascending=[0, 1])
         print(coeffdf.head(10))
+"""
